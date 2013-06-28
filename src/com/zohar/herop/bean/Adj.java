@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class Adj {
 	public static final int TYPE_BIONT = 1;
-	public static final int TYPE_EQUIP = 2;
+	public static final int TYPE_ITEM = 2;
 	
 	private String name;
 	private int type;
