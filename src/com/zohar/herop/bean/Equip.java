@@ -6,7 +6,7 @@ package com.zohar.herop.bean;
 /**
  * 
  * 
- * @author Administrator
+ * @author zohar
  * @version 1.0, 2013-6-28
  */
 public class Equip extends Item {

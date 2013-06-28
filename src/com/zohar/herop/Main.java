@@ -5,12 +5,13 @@
 package com.zohar.herop;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
+
+import com.zohar.herop.common.Constant;
 
 /**
  * 
  * 
- * @author Administrator
+ * @author zohar
  * @version 1.0, 2013-6-27
  */
 public class Main {
@@ -20,8 +21,7 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		Locale.setDefault(Locale.CHINA);
-		ResourceBundle bundle = ResourceBundle.getBundle("language/BaseInfo",Locale.getDefault());
-		System.out.println(bundle.getString("name")+" "+bundle.getString("age"));
+		System.out.println(Constant.getString("name")+" "+Constant.getString("age"));
 	}
 
 }
