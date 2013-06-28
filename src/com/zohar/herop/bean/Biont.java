@@ -24,7 +24,7 @@ public class Biont {
 	private int msp;
 	private int ap;
 	private int map;
-	private int status;
+	private List<Status> statuses;
 	private int atk;
 	private int dfn;
 	private int satk;
@@ -107,12 +107,6 @@ public class Biont {
 	public void setMap(int map) {
 		this.map = map;
 	}
-	public int getStatus() {
-		return status;
-	}
-	public void setStatus(int status) {
-		this.status = status;
-	}
 	public int getAtk() {
 		return atk;
 	}
@@ -167,6 +161,10 @@ public class Biont {
 	public void setSkills(List<Skill> skills) {
 		this.skills = skills;
 	}
-	
-	
+	public List<Status> getStatuses() {
+		return statuses;
+	}
+	public void setStatuses(List<Status> statuses) {
+		this.statuses = statuses;
+	}
 }
