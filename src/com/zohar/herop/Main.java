@@ -20,8 +20,7 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Locale.setDefault(Locale.CHINA);
-		System.out.println(Constant.getString("name")+" "+Constant.getString("age"));
+		Locale.setDefault(Locale.US);
 	}
 
 }
