@@ -35,7 +35,7 @@ public class KcEditorMain extends JPanel {
 		return jplPanel;
 	}
 	public static void main(String[] args) {
-		JFrame frame = new JFrame("HeroP Data Editor");
+		JFrame frame = new JFrame("KCRS Data Editor");
 		frame.addWindowListener(new WindowAdapter() {
 
 			public void windowClosing(WindowEvent e) {
