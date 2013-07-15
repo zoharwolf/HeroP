@@ -18,21 +18,32 @@ public class Biont {
 	private int bodyPic;
 	private int facePic;
 	private int lv;
+	private int mlv;
 	private int hp;
 	private int mhp;
+	private int exhp;
 	private int sp;
 	private int msp;
+	private int exsp;
 	private int ap;
 	private int map;
 	private List<Status> statuses;
 	private int atk;
+	private int exatk;
 	private int dfn;
+	private int exdfn;
 	private int satk;
+	private int exsatk;
 	private int sdfn;
+	private int exsdfn;
 	private int str;
+	private int exstr;
 	private int itg;
+	private int exitg;
 	private int spd;
+	private int exspd;
 	private int luk;
+	private int exluk;
 	private List<Skill> skills;
 	
 	public List<Adj> getAdj() {
@@ -167,4 +178,71 @@ public class Biont {
 	public void setStatuses(List<Status> statuses) {
 		this.statuses = statuses;
 	}
+	public int getMlv() {
+		return mlv;
+	}
+	public void setMlv(int mlv) {
+		this.mlv = mlv;
+	}
+	public int getExhp() {
+		return exhp;
+	}
+	public void setExhp(int exhp) {
+		this.exhp = exhp;
+	}
+	public int getExsp() {
+		return exsp;
+	}
+	public void setExsp(int exsp) {
+		this.exsp = exsp;
+	}
+	public int getExatk() {
+		return exatk;
+	}
+	public void setExatk(int exatk) {
+		this.exatk = exatk;
+	}
+	public int getExdfn() {
+		return exdfn;
+	}
+	public void setExdfn(int exdfn) {
+		this.exdfn = exdfn;
+	}
+	public int getExsatk() {
+		return exsatk;
+	}
+	public void setExsatk(int exsatk) {
+		this.exsatk = exsatk;
+	}
+	public int getExsdfn() {
+		return exsdfn;
+	}
+	public void setExsdfn(int exsdfn) {
+		this.exsdfn = exsdfn;
+	}
+	public int getExstr() {
+		return exstr;
+	}
+	public void setExstr(int exstr) {
+		this.exstr = exstr;
+	}
+	public int getExitg() {
+		return exitg;
+	}
+	public void setExitg(int exitg) {
+		this.exitg = exitg;
+	}
+	public int getExspd() {
+		return exspd;
+	}
+	public void setExspd(int exspd) {
+		this.exspd = exspd;
+	}
+	public int getExluk() {
+		return exluk;
+	}
+	public void setExluk(int exluk) {
+		this.exluk = exluk;
+	}
+	
 }

@@ -16,6 +16,8 @@ import java.util.ResourceBundle;
  */
 public class Constant {
 	
+	public static int BOX_WIDTH = 3000;
+	
 	private static ResourceBundle baseInfoBundle = ResourceBundle.getBundle("language/BaseInfo",Locale.getDefault());
 
 	/**

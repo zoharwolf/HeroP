@@ -14,6 +14,8 @@ import java.util.List;
  */
 public class Enemy extends Biont {
 	List<Item> relic;
+	int exp;
+	int gold;
 
 	public List<Item> getRelic() {
 		return relic;
@@ -22,4 +24,22 @@ public class Enemy extends Biont {
 	public void setRelic(List<Item> relic) {
 		this.relic = relic;
 	}
+
+	public int getExp() {
+		return exp;
+	}
+
+	public void setExp(int exp) {
+		this.exp = exp;
+	}
+
+	public int getGold() {
+		return gold;
+	}
+
+	public void setGold(int gold) {
+		this.gold = gold;
+	}
+	
+	
 }
