@@ -4,16 +4,25 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -21,7 +30,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -33,24 +41,26 @@ import com.zohar.herop.common.ToolUtil;
 public class CharaPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
-	private static final String FILE_PATH = "F:/program/krkrœ‡πÿ/KCRS/Data/scenario/charaData.ks";
+	private static final String FILE_PATH = "D:/Program Files/KAGeXpress/KCRS/Data/scenario/charaData.ks";
+	private static final String FILE_BAK_DIR = "bak/";
 	
 	private Map<String, Component> compMap = new HashMap<String, Component>(); 
 	private List<String> allName = new ArrayList<String>();
 	private Map<String, String> allNameFull = new HashMap<String, String>();
 	private Map<Integer, List<String>> charInfoMap = new HashMap<Integer, List<String>>();
 	
-	@SuppressWarnings("rawtypes")
 	JList itemList = null;
-	@SuppressWarnings("rawtypes")
+	DefaultListModel itemListModel = null;
 	JList infoList = null;
+	DefaultListModel infoListModel = null;
 	JTextField nameTf = null;
 	JTextArea infoTa = null;
 
 	private int curItemIndex = 0;
 	private int curInfoIndex = 0;
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	StringBuffer oriTxt = new StringBuffer();
+	
 	public CharaPanel(){
 		try{
 			this.setLayout(new BorderLayout(5,5));
@@ -58,15 +68,19 @@ public class CharaPanel extends JPanel {
 			prepareData();
 			
 			// item list
+			itemListModel = new DefaultListModel();
 			String[] itemArr = allName.toArray(new String[allName.size()]);
 			for (int i=0;i<itemArr.length;i++){
 				String fullName = allNameFull.get(itemArr[i]);
 				itemArr[i] = i + ". " + fullName;
+				itemListModel.addElement(itemArr[i]);
 			}
-			itemList = new JList(itemArr);
+			
+			itemList = new JList(itemListModel);
 			itemList.setSelectedIndex(0);
 			curItemIndex = 0;
 			itemList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			EditorUtil.fixSize(itemList, 80, null);
 			itemList.addListSelectionListener(new ListSelectionListener(){
 				@Override
 				public void valueChanged(ListSelectionEvent e) {
@@ -78,12 +92,11 @@ public class CharaPanel extends JPanel {
 			});
 			
 			JPanel itemListPan = new JPanel();
-			TitledBorder itemTitle =new TitledBorder("Characters");
-			itemListPan.setBorder(itemTitle);
+			itemListPan.setLayout(new BorderLayout(5,5));
+			itemListPan.setBorder(BorderFactory.createTitledBorder("Characters"));
 			JScrollPane js = new JScrollPane(itemList);
-			itemListPan.add(js);
 			EditorUtil.fixSize(js, null, 500);
-			EditorUtil.fixSize(itemList, 80, null);
+			itemListPan.add(js, BorderLayout.CENTER);
 			
 			this.add(itemListPan, BorderLayout.WEST);
 			
@@ -99,22 +112,42 @@ public class CharaPanel extends JPanel {
 			inputPanel.add(nameTf);
 			inputPanel.add(new JLabel("  Info"));
 			infoTa = new JTextArea(4, 30);
+			infoTa.setLineWrap(true);
 			inputPanel.add(infoTa);
 			
 			// right part down info List
 			infoList = new JList();
 			JScrollPane infoJs = new JScrollPane(infoList);
-			TitledBorder infoListBorder = new TitledBorder("Information List");
-			infoList.setBorder(infoListBorder);
+			infoList.setBorder(BorderFactory.createTitledBorder("Information List"));
 			EditorUtil.fixSize(infoJs, null, 400);
 			EditorUtil.fixSize(infoList, 400, null);
 			
+			// add Button and save button
+			JButton addInfoBtn = new JButton("Add");
+			addInfoBtn.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					addInfo();
+				}
+			});
+			JButton saveBtn = new JButton("Save");
+			saveBtn.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					saveDataToFile();
+				}
+			});
+			JPanel btnPanel = new JPanel();
+			btnPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 1));
+			btnPanel.add(addInfoBtn);
+			btnPanel.add(saveBtn);
+			
 			// compose right info Panel.
-			TitledBorder dataTitle =new TitledBorder("Data Edit");
-			infoPan.setBorder(dataTitle);
+			infoPan.setBorder(BorderFactory.createTitledBorder("Data Edit"));
 			infoPan.setLayout(new BorderLayout(5,5));
 			infoPan.add(inputPanel, BorderLayout.NORTH);
 			infoPan.add(infoList,BorderLayout.CENTER);
+			infoPan.add(btnPanel, BorderLayout.SOUTH);
 			
 			this.add(infoPan, BorderLayout.CENTER);
 			
@@ -125,9 +158,70 @@ public class CharaPanel extends JPanel {
 		}
 	}
 	
+	// save data to file and bak up old file
+	protected void saveDataToFile() {
+		saveTempData("save data to file");
+		ToolUtil.backUpFile(FILE_PATH, FILE_BAK_DIR+"charaData.ks."+ToolUtil.genTimeSuffix()+".bak");
+		
+		StringBuffer newTxt = new StringBuffer();
+		int endIndex = oriTxt.indexOf("@endscript");
+		if (endIndex>-1){
+			newTxt.append(oriTxt.substring(0, endIndex));
+			newTxt.append(genNewCharInfoStr());
+			newTxt.append("@endscript");
+			
+			File file = new File(FILE_PATH);
+			try {
+				OutputStreamWriter fos = new OutputStreamWriter(new FileOutputStream(file), "GBK");
+				BufferedWriter writer = new BufferedWriter(fos);
+				writer.write(newTxt.toString());
+				
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else{
+			// Âá∫ÈîôÊèêÁ§∫
+		}
+	}
+	
+	// generate String using the new charInfoMap
+	private String genNewCharInfoStr() {
+		StringBuffer charInfoStr = new StringBuffer();
+		for (int i=0;i<allName.size();i++){
+			List<String> infoDataList = charInfoMap.get(i);
+			if (!ToolUtil.isNullOrEmpty(infoDataList)){
+				StringBuffer content = new StringBuffer();
+				for (String info: infoDataList){
+					if (content.length()>0){
+						content.append(",");
+					}
+					content.append("\"").append(info).append("\"");
+				}
+				charInfoStr.append("f.charInfo[").append(i).append("]=[").append(content).append("];\r\n");
+			}
+		}
+		
+		return charInfoStr.toString();
+	}
+
+	// add a blank info in infoList
+	protected void addInfo() {
+		int infoSize = infoListModel.getSize();
+		List<String> infoDataList = charInfoMap.get(curItemIndex);
+		if (infoDataList==null){
+			infoDataList = new ArrayList<String>();
+			charInfoMap.put(curItemIndex, infoDataList);
+		}
+		infoDataList.add("");
+		infoListModel.addElement(infoSize + ". ");
+		infoList.setSelectedIndex(infoSize);
+		infoTa.setText("");
+	}
+
 	// update the data in right panel
-	@SuppressWarnings("unchecked")
 	protected void updateRightData() {
+		
 		int index = itemList.getSelectedIndex();
 		curItemIndex = index;
 		curInfoIndex = 0;
@@ -136,21 +230,24 @@ public class CharaPanel extends JPanel {
 		nameTf.setText(fullName);
 		
 		List<String> infoDataList = charInfoMap.get(index);
+		infoListModel = new DefaultListModel();
 		String[] infoArr;
 		if (infoDataList!=null && infoDataList.size()>0){
 			infoArr = infoDataList.toArray(new String[infoDataList.size()]);
 			for (int i=0;i<infoArr.length;i++){
 				infoArr[i] = i + ". " + infoArr[i];
+				infoListModel.addElement(infoArr[i]);
 			}
 		} else {
 			infoArr = new String[1];
 			infoArr[0] = "";
+			addInfo();
 		}
 		ListSelectionListener[] listeners = infoList.getListSelectionListeners();
 		for (ListSelectionListener listener: listeners){
 			infoList.removeListSelectionListener(listener);
 		}
-		infoList.setListData(infoArr);
+		infoList.setModel(infoListModel);
 		infoList.setSelectedIndex(0);
 		infoList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		infoList.addListSelectionListener(new ListSelectionListener(){
@@ -168,11 +265,17 @@ public class CharaPanel extends JPanel {
 
 	// save data to program instance.
 	protected void saveTempData(String text) {
-		System.out.println(text+" curItemIndex: "+curItemIndex+" curInfoIndex: "+curInfoIndex);
+		//System.out.println(text+" curItemIndex: "+curItemIndex+" curInfoIndex: "+curInfoIndex);
+		String name = allName.get(curItemIndex);
+		String newFullName = nameTf.getText();
+		allNameFull.put(name, newFullName);
+		itemListModel.setElementAt(curItemIndex + ". " + newFullName, curItemIndex);
+		
 		List<String> curInfoList = charInfoMap.get(curItemIndex);
 		String desc = infoTa.getText();
 		if (!ToolUtil.isNullOrEmpty(curInfoList)){
 			curInfoList.set(curInfoIndex, desc);
+			infoListModel.setElementAt(curInfoIndex + ". " + desc, curInfoIndex);
 		}
 	}
 
@@ -195,7 +298,6 @@ public class CharaPanel extends JPanel {
 	}
 
 	// read data from file
-	@SuppressWarnings("resource")
 	private void prepareData() throws Exception {
 		File file = new File(FILE_PATH);
 		if (file.isFile() && file.exists()){
@@ -203,7 +305,9 @@ public class CharaPanel extends JPanel {
 			BufferedReader br = new BufferedReader(reader);
 			String line = br.readLine();
 			while(line!=null){
-				System.out.println(line);
+//				System.out.println(line);
+				boolean isOriTxt = true;
+				
 				// sf.allName init line
 				String sfAllName = RegUtil.regFindByGroup("sf\\.allName=\\[(.*)\\];$", line, 1);
 				if (sfAllName!=null){
@@ -235,10 +339,19 @@ public class CharaPanel extends JPanel {
 						infoList.add(n.substring(1, n.length()-1));
 					}
 					charInfoMap.put(index, infoList);
+					
+					isOriTxt = false;
+				}
+				
+				if (isOriTxt){
+					oriTxt.append(line).append("\r\n");
 				}
 				
 				line = br.readLine();
 			}
+			
+			br.close();
+			reader.close();
 		}
 	}
 
